@@ -2,7 +2,7 @@
 #define CURRENT_CPU_CLOCK 3.6
 #define BOVIK_CPU_CLOCK 2.2
 #define FACTOR CURRENT_CPU_CLOCK/BOVIK_CPU_CLOCK
-#define NSIM 1
+#define NSIM 10000
 
 
 int main(){
@@ -12,7 +12,7 @@ int main(){
 	
 	Mat img = imread("./img.png", IMREAD_UNCHANGED);
 	Mat imgRef = imread("./imgRef.png", IMREAD_UNCHANGED);
-	
+	/*
 	start = chrono::high_resolution_clock::now();
 	for(i=0; i<NSIM; i++){
 		SepConvSSIM(img, imgRef, 1.5);
@@ -38,7 +38,7 @@ int main(){
     end = chrono::high_resolution_clock::now();
     diffTime = end - start;
     cout << "The processing speed using the SSIM calculated by DFTs is: " << NSIM/(diffTime.count()*FACTOR) <<" fps."<< endl;
-
+	*/
 	
     start = chrono::high_resolution_clock::now();
     for(i=0; i<NSIM; i++){
@@ -48,7 +48,7 @@ int main(){
     diffTime = end - start;
     cout << "The processing speed using the SSIM calculated by FastSSIM algorithm proposed by Bovik without separable filters is: " << NSIM/(diffTime.count()*FACTOR) <<" fps."<< endl;
     
-    
+    /*
     start = chrono::high_resolution_clock::now();
     for(i=0; i<NSIM; i++){
     	BovikFastSSIMv2(img, imgRef, 1.5);
@@ -56,7 +56,7 @@ int main(){
     end = chrono::high_resolution_clock::now();
     diffTime = end - start;
     cout << "The processing speed using the SSIM calculated by FastSSIM algorithm proposed by Bovik with separable filters is: " << NSIM/(diffTime.count()*FACTOR) <<" fps."<< endl;
-    
+    */
     
 	return 0;
 }

@@ -1,6 +1,56 @@
 #include "FastSSIM.h"
 
+void getCummulativeImage(Mat img, Mat dst){
+	double leftCorner, upperCorner, upperLeftCorner;
+	for(int i=0; i<img.rows; i++){
+		for(int j=0; j<img.cols; j++){
+			leftCorner = (j>0)? dst.at<double>(i, j-1) : 0.0;
+			upperCorner = (i>0)? dst.at<double>(i-1, j) : 0.0;
+			upperLeftCorner = (i>0 && j>0)? dst.at<double>(i-1, j-1) : 0.0;
+			dst.at<double>(i, j) =  (img.at<double>(i, j) + leftCorner) +  (upperCorner - upperLeftCorner);
+		}
+	}
+
+}
  
+void getMeanByCummulativeImage(Mat accumImg, Mat dst){
+	// img and dst cannot be the same image, because it will corrupt the operation
+	int xLeft, xRight, yUp, yDown;
+	/*for(int i=0; i<accumImg.rows; i++){
+		for(int j=0; j<accumImg.cols; j++){
+			xLeft = max(j - (WINDOW_SIZE-1)/2, 0);
+			xRight = min(j + (WINDOW_SIZE-1)/2, accumImg.cols-1);
+			yUp = max(i - (WINDOW_SIZE-1)/2, 0);
+			yDown = min(i + (WINDOW_SIZE-1)/2, accumImg.rows-1);
+
+			dst.at<double>(i, j) = (accumImg.at<double>(yDown, xRight) + accumImg.at<double>(yUp, xLeft)) - (accumImg.at<double>(yUp, xRight) + accumImg.at<double>(yDown, xLeft));
+		}
+	}*/
+	
+	Mat temp(accumImg.rows+WINDOW_SIZE-1, accumImg.cols+WINDOW_SIZE-1, accumImg.type());
+	copyMakeBorder(accumImg, temp, (WINDOW_SIZE-1)/2, (WINDOW_SIZE-1)/2,
+               (WINDOW_SIZE-1)/2, (WINDOW_SIZE-1)/2, BORDER_REPLICATE);
+	
+
+	Mat leftUpperImg(temp, Rect(0, 0, accumImg.cols, accumImg.rows));
+	Mat leftImg(temp, Rect(0, (WINDOW_SIZE-1)/2, accumImg.cols, accumImg.rows));
+	Mat upperImg(temp, Rect((WINDOW_SIZE-1)/2, 0, accumImg.cols, accumImg.rows));
+	//Mat img(accumImg, Rect((WINDOW_SIZE-1)/2, (WINDOW_SIZE-1)/2, accumImg.cols, accumImg.rows));
+	
+	dst = (accumImg + leftUpperImg) - (leftImg + upperImg);
+}
+
+
+void getMeanImage(Mat img, Mat dst){
+	Mat tmp(img.size()+Size(1, 1), img.type());
+	integral(img, tmp, -1);
+	Mat accumImg(tmp, Rect(1, 1, img.cols, img.rows));
+	
+	//getCummulativeImage(img, tmp);
+	getMeanByCummulativeImage(accumImg, dst);
+}
+
+
 Mat FourierSSIM(Mat img, Mat imgRef, double radius, int dynamicRange, vector<double> exponents){
 	Size imgSize = img.size();
 	
@@ -289,10 +339,10 @@ Mat BovikFastSSIM(Mat img, Mat imgRef, double radius, int dynamicRange, vector<d
 	
 	//Calculation of all the statistics mentioned before
 	//Don't care if we are doing cross-correlation or convolution because the filter is symmetric    
-    filter2D(img, mu_x, -1, weights, Point(-1, -1), 0, BORDER_CONSTANT);
+    filter2D(img, mu_x, -1, weights, Point(-1, -1), 0, BORDER_CONSTANT);//getMeanImage(img, mu_x);//
     filter2D(gradientImg, std_x, -1, weights, Point(-1, -1), 0, BORDER_CONSTANT);
     
-    filter2D(imgRef, mu_y, -1, weights, Point(-1, -1), 0, BORDER_CONSTANT);
+    filter2D(imgRef, mu_y, -1, weights, Point(-1, -1), 0, BORDER_CONSTANT);//getMeanImage(imgRef, mu_y);//
     filter2D(gradientImgRef, std_y, -1, weights, Point(-1, -1), 0, BORDER_CONSTANT);
     
 	

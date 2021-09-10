@@ -1,1 +1,10 @@
 You can prove different versions of fast SSIM using the command script this way: ./command
+
+The following databases were used to test the implementations:
+
+LIVE Image Quality Assessment Database
+http://live.ece.utexas.edu/research/quality/subjective.htm
+
+LIVE Video Quality Assessment Database
+http://live.ece.utexas.edu/research/quality/live_video.html
+
