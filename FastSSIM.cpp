@@ -339,10 +339,10 @@ Mat BovikFastSSIM(Mat img, Mat imgRef, double radius, int dynamicRange, vector<d
 	
 	//Calculation of all the statistics mentioned before
 	//Don't care if we are doing cross-correlation or convolution because the filter is symmetric    
-    filter2D(img, mu_x, -1, weights, Point(-1, -1), 0, BORDER_CONSTANT);//getMeanImage(img, mu_x);//
+    getMeanImage(img, mu_x);//filter2D(img, mu_x, -1, weights, Point(-1, -1), 0, BORDER_CONSTANT);
     filter2D(gradientImg, std_x, -1, weights, Point(-1, -1), 0, BORDER_CONSTANT);
     
-    filter2D(imgRef, mu_y, -1, weights, Point(-1, -1), 0, BORDER_CONSTANT);//getMeanImage(imgRef, mu_y);//
+    getMeanImage(imgRef, mu_y); //filter2D(imgRef, mu_y, -1, weights, Point(-1, -1), 0, BORDER_CONSTANT);
     filter2D(gradientImgRef, std_y, -1, weights, Point(-1, -1), 0, BORDER_CONSTANT);
     
 	
